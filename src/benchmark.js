@@ -4,6 +4,8 @@ import mqtt from 'mqtt';
 import Promise from 'bluebird';
 import logUpdate from 'log-update';
 import readline from 'readline';
+const percentile = require("percentile");
+const median = require('median')
 
 const argv = require('minimist')(process.argv.slice(1));
 
@@ -218,6 +220,8 @@ function roundBy(decimalDigit = 3){
 function report(){
   const numMsgPerSecond = metrics.numMsgRecv / (metrics.timeSpan/1000);
   const latencyAvg = metrics.numMsgRecv ? metrics.latency / metrics.numMsgRecv: 0;
+  const latency95th = percentile(95, metrics.latency);
+  const latencyMedian = median(metrics.latency);
   metrics.numMsgPerSecond = numMsgPerSecond;
   metrics.latencyAvg = latencyAvg;
   const roundBy3 = roundBy(3);
@@ -230,9 +234,11 @@ function report(){
   console.log('Total Message Received:', metrics.numMsgRecv);
   console.log('> Number of messages delivered per second:', roundBy3(metrics.numMsgPerSecond));
   console.log('---');
-  console.log('Total Deliver Message Latency:', roundBy3(metrics.latency/1000), 's');
-  console.log('> Average Latency per Message:', roundBy3(metrics.latencyAvg/1000), 's');
-  console.log('> Maximum Latency per Message:', roundBy3(metrics.latencyMax/1000), 's');
+  console.log('Total Deliver Message Latency:', roundBy3(metrics.latency), 'ms');
+  console.log('> Median Latency:', roundBy3(latencyMedian), 'ms');
+  console.log('> 95th Percentile:', roundBy3(latency95th), 'ms');
+  console.log('> Average Latency per Message:', roundBy3(metrics.latencyAvg), 'ms');
+  console.log('> Maximum Latency per Message:', roundBy3(metrics.latencyMax), 'ms');
   console.log('===========================================================');
 }
 

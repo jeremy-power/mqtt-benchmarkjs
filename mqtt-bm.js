@@ -28964,6 +28964,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var argv = require('minimist')(process.argv.slice(1));
 
+const percentile = require("percentile");
+const median = require('median')
 var rl = _readline2.default.createInterface({
   input: process.stdin,
   output: process.stdout
@@ -29000,6 +29002,7 @@ var numSub = parseInt(conf.numSub);
 var numPub = parseInt(conf.numPub);
 
 var metrics = {
+  allLatency: [],
   numMsgSent: 0,
   numMsgRecv: 0,
   timeSpan: 0,
@@ -29164,6 +29167,7 @@ function stressTest() {
         var timeSent = msg.split('|').splice(-1);
         var msgLatency = +new Date() - timeSent;
         metrics.latency += msgLatency;
+        metrics.allLatency.push(msgLatency);
         if (msgLatency > metrics.latencyMax) {
           metrics.latencyMax = msgLatency;
         }
@@ -29189,6 +29193,8 @@ function roundBy() {
 function report() {
   var numMsgPerSecond = metrics.numMsgRecv / (metrics.timeSpan / 1000);
   var latencyAvg = metrics.numMsgRecv ? metrics.latency / metrics.numMsgRecv : 0;
+  const latency95th = percentile(95, metrics.allLatency);
+  const latencyMedian = median(metrics.allLatency);
   metrics.numMsgPerSecond = numMsgPerSecond;
   metrics.latencyAvg = latencyAvg;
   var roundBy3 = roundBy(3);
@@ -29201,9 +29207,11 @@ function report() {
   console.log('Total Message Received:', metrics.numMsgRecv);
   console.log('> Number of messages delivered per second:', roundBy3(metrics.numMsgPerSecond));
   console.log('---');
-  console.log('Total Deliver Message Latency:', roundBy3(metrics.latency / 1000), 's');
-  console.log('> Average Latency per Message:', roundBy3(metrics.latencyAvg / 1000), 's');
-  console.log('> Maximum Latency per Message:', roundBy3(metrics.latencyMax / 1000), 's');
+  console.log('Total Deliver Message Latency:', roundBy3(metrics.latency), 'ms');
+  console.log('> Median Latency:', roundBy3(latencyMedian), 'ms');
+  console.log('> 95th Percentile:', roundBy3(latency95th), 'ms');
+  console.log('> Average Latency per Message:', roundBy3(metrics.latencyAvg), 'ms');
+  console.log('> Maximum Latency per Message:', roundBy3(metrics.latencyMax), 'ms');
   console.log('===========================================================');
 }
 
