@@ -29193,6 +29193,7 @@ function roundBy() {
 function report() {
   var numMsgPerSecond = metrics.numMsgRecv / (metrics.timeSpan / 1000);
   var latencyAvg = metrics.numMsgRecv ? metrics.latency / metrics.numMsgRecv : 0;
+  const latency5th = percentile(5, metrics.allLatency);
   const latency95th = percentile(95, metrics.allLatency);
   const latencyMedian = median(metrics.allLatency);
   metrics.numMsgPerSecond = numMsgPerSecond;
@@ -29209,6 +29210,7 @@ function report() {
   console.log('---');
   console.log('Total Deliver Message Latency:', roundBy3(metrics.latency), 'ms');
   console.log('> Median Latency:', roundBy3(latencyMedian), 'ms');
+  console.log('> 5th Percentile:', roundBy3(latency5th), 'ms');
   console.log('> 95th Percentile:', roundBy3(latency95th), 'ms');
   console.log('> Average Latency per Message:', roundBy3(metrics.latencyAvg), 'ms');
   console.log('> Maximum Latency per Message:', roundBy3(metrics.latencyMax), 'ms');
