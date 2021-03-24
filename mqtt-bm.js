@@ -29122,7 +29122,6 @@ function sendMsg(pubList) {
       }
     });
     delay = randomExponential( rate / 1000 ); //returns delay based on rate
-    console.log('doTransfer:', delay);
     sendMsg(pubList);
   }, delay)
 }
@@ -29144,7 +29143,6 @@ var stopTransfer = null;
 
 function doTransfer(pubList) {
   var logStatus = makeLogStatus(+new Date());
-  console.log('doTransfer:', delay);
   
   sendMsg(pubList);
 
