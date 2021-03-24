@@ -28972,7 +28972,7 @@ var rl = _readline2.default.createInterface({
 });
 
 function getConfigFromCmd(argv) {
-  var acceptArgs = ['host', 'login', 'password', 'topic', 'numSub', 'numPub'];
+  var acceptArgs = ['host', 'login', 'password', 'topic', 'numSub', 'numPub', 'rate'];
 
   if (argv.fileConfig) {
     // TODO: read config from file
@@ -28998,6 +28998,11 @@ var brokerUrl = conf.host;
 var login = conf.login;
 var password = conf.password;
 var topicId = conf.topic;
+if(conf.rate) {
+  var rate = parseFloat(conf.rate);
+} else {
+  var rate = 1;
+}
 var numSub = parseInt(conf.numSub);
 var numPub = parseInt(conf.numPub);
 
@@ -29107,14 +29112,21 @@ function times(num) {
   return result;
 }
 
+var delay = randomExponential( rate / 1000 ); //returns delay based on rate
+
 function sendMsg(pubList) {
-  pubList.forEach(function (pub) {
-    if (pub.connected) {
-      metrics.numMsgSent++;
-      var msg = ['Test Msg ', metrics.numMsgSent, +new Date()].join('|');
-      pub.publish(topicId, msg);
-    }
-  });
+  setTimeout(function () {
+    pubList.forEach(function (pub) {
+      if (pub.connected) {
+        metrics.numMsgSent++;
+        var msg = ['Test Msg ', metrics.numMsgSent, +new Date()].join('|');
+        pub.publish(topicId, msg);
+      }
+    });
+    delay = randomExponential( rate / 1000 ); //returns delay based on rate
+    console.log('doTransfer:', delay);
+    sendMsg(pubList);
+  }, delay)
 }
 
 function makeLogStatus(timeStart) {
@@ -29131,16 +29143,25 @@ function makeLogStatus(timeStart) {
 }
 
 var stopTransfer = null;
+
 function doTransfer(pubList) {
   var logStatus = makeLogStatus(+new Date());
-  var tidSendMsg = setInterval(function () {
-    return sendMsg(pubList);
-  }, 1000);
+  console.log('doTransfer:', delay);
+  
+  sendMsg(pubList);
+
+  // var tidSendMsg = setInterval(function () {
+  //   let delay = randomExponential(60) * 60*60*1000; //returns delay based on rate
+  //   console.log('doTransfer:', delay);
+  //   return sendMsg(pubList);
+  // }, delay);
+
   var tidLogStatus = setInterval(function () {
     return logStatus(metrics.numMsgSent, metrics.numMsgRecv);
   }, 80);
+
   stopTransfer = function stopTransfer() {
-    clearInterval(tidSendMsg);
+    // clearInterval(tidSendMsg);
     clearInterval(tidLogStatus);
     _logUpdate2.default.done();
     return function resume() {
@@ -29150,6 +29171,20 @@ function doTransfer(pubList) {
 
   return stopTransfer;
 }
+
+function randomExponential(rate, randomUniform) {
+  // http://en.wikipedia.org/wiki/Exponential_distribution#Generating_exponential_variates
+  rate = rate || 1;
+
+  // Allow to pass a random uniform value or function
+  // Default to Math.random()
+  var U = randomUniform;
+  if (typeof randomUniform === 'function') U = randomUniform();
+  if (!U) U = Math.random();
+
+  return -Math.log(U)/rate;
+}
+
 
 function stressTest() {
   var funSetupSubsList = times(numSub).map(function (i) {

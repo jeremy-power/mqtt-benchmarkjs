@@ -17,7 +17,7 @@ const rl = readline.createInterface({
 function getConfigFromCmd(argv){
   const acceptArgs = [
     'host', 'login', 'password', 'topic',
-    'numSub', 'numPub',
+    'numSub', 'numPub', 'rate'
   ];
 
   if(argv.fileConfig){
