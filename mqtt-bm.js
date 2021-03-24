@@ -29233,7 +29233,6 @@ function report() {
   console.log('===========================================================');
   console.log('MQTT broker Benchmark result');
   console.log('Host:', brokerUrl);
-  console.log('Topic(s):', topicId);
   console.log('---');
   console.log('Total Message Sent:', metrics.numMsgSent);
   console.log('Total Message Received:', metrics.numMsgRecv);
