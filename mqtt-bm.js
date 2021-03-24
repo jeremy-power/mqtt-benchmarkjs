@@ -28972,7 +28972,7 @@ var rl = _readline2.default.createInterface({
 });
 
 function getConfigFromCmd(argv) {
-  var acceptArgs = ['host', 'login', 'password', 'numSub', 'numPub', 'rate'];
+  var acceptArgs = ['host', 'login', 'password', 'numPubSub', 'rate'];
 
   if (argv.fileConfig) {
     // TODO: read config from file
@@ -29002,8 +29002,7 @@ if(conf.rate) {
 } else {
   var rate = 1;
 }
-var numSub = parseInt(conf.numSub);
-var numPub = parseInt(conf.numPub);
+var numPubSub = parseInt(conf.numPubSub);
 
 var metrics = {
   allLatency: [],
@@ -29014,8 +29013,7 @@ var metrics = {
   latency: 0,
   latencyAvg: 0,
   latencyMax: 0,
-  numSub: numSub,
-  numPub: numPub
+  numPubSub: numPubSub,
 };
 
 function makeMqttClient() {
@@ -29187,10 +29185,10 @@ function randomExponential(rate, randomUniform) {
 
 
 function stressTest() {
-  var funSetupSubsList = times(numSub).map(function (i) {
+  var funSetupSubsList = times(numPubSub).map(function (i) {
     return setupOneSubscriberForTopic.bind(null, 'stress-test-sub-' + (i + 1), "req/" + i);
   });
-  var funSetupPubsList = times(numPub).map(function (i) {
+  var funSetupPubsList = times(numPubSub).map(function (i) {
     return setupOnePublisher.bind(null, 'stress-test-pub-' + (i + 1));
   });
 
