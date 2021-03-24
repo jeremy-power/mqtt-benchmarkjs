@@ -11,8 +11,7 @@ Follow the instruction benchmark setup on this doc http://www.scalagent.com/IMG/
 
 Example command: 
 ```
-node mqtt-bm.js --host="127.0.0.1" --login="test" --password="test" \
-  --topic=t1
-  --numPub=1000
-  --numSub=1
+numPubSub: number of publisher and subscriber pairs
+rate: number of messages per second approximately by exponential randomness
+node mqtt-bm.js --host="127.0.0.1"  --numPubSub=10 --rate=1
 ```
