@@ -28972,7 +28972,7 @@ var rl = _readline2.default.createInterface({
 });
 
 function getConfigFromCmd(argv) {
-  var acceptArgs = ['host', 'login', 'password', 'topic', 'numSub', 'numPub', 'rate'];
+  var acceptArgs = ['host', 'login', 'password', 'numSub', 'numPub', 'rate'];
 
   if (argv.fileConfig) {
     // TODO: read config from file
@@ -28997,7 +28997,6 @@ var conf = getConfigFromCmd(argv);
 var brokerUrl = conf.host;
 var login = conf.login;
 var password = conf.password;
-var topicId = conf.topic;
 if(conf.rate) {
   var rate = parseFloat(conf.rate);
 } else {
@@ -29116,11 +29115,12 @@ var delay = randomExponential( rate / 1000 ); //returns delay based on rate
 
 function sendMsg(pubList) {
   setTimeout(function () {
+    let i = 0
     pubList.forEach(function (pub) {
       if (pub.connected) {
         metrics.numMsgSent++;
         var msg = ['Test Msg ', metrics.numMsgSent, +new Date()].join('|');
-        pub.publish(topicId, msg);
+        pub.publish("req/" + i, msg);
       }
     });
     delay = randomExponential( rate / 1000 ); //returns delay based on rate
@@ -29188,7 +29188,7 @@ function randomExponential(rate, randomUniform) {
 
 function stressTest() {
   var funSetupSubsList = times(numSub).map(function (i) {
-    return setupOneSubscriberForTopic.bind(null, 'stress-test-sub-' + (i + 1), topicId);
+    return setupOneSubscriberForTopic.bind(null, 'stress-test-sub-' + (i + 1), "req/" + i);
   });
   var funSetupPubsList = times(numPub).map(function (i) {
     return setupOnePublisher.bind(null, 'stress-test-pub-' + (i + 1));
