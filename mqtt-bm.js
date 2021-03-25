@@ -28972,7 +28972,7 @@ var rl = _readline2.default.createInterface({
 });
 
 function getConfigFromCmd(argv) {
-  var acceptArgs = ['host', 'login', 'password', 'numPubSub', 'rate', 'timeout'];
+  var acceptArgs = ['host', 'login', 'password', 'numPubSub', 'rate', 'timeout', 'limitLogging'];
 
   if (argv.fileConfig) {
     // TODO: read config from file
@@ -28997,6 +28997,11 @@ var conf = getConfigFromCmd(argv);
 var brokerUrl = conf.host;
 var login = conf.login;
 var password = conf.password;
+if(conf.limitLogging) {
+  var limitLogging = conf.limitLogging;
+} else {
+  var limitLogging = false;
+}
 if(conf.rate) {
   var rate = parseFloat(conf.rate);
 } else {
@@ -29158,10 +29163,15 @@ function doTransfer(pubList) {
   //   console.log('doTransfer:', delay);
   //   return sendMsg(pubList);
   // }, delay);
-
-  var tidLogStatus = setInterval(function () {
-    return logStatus(metrics.numMsgSent, metrics.numMsgRecv);
-  }, 80);
+  if(limitLogging) {
+    var tidLogStatus = setInterval(function () {
+      return logStatus(metrics.numMsgSent, metrics.numMsgRecv);
+    }, 5000);
+  } else {
+    var tidLogStatus = setInterval(function () {
+      return logStatus(metrics.numMsgSent, metrics.numMsgRecv);
+    }, 80);
+  }
 
   stopTransfer = function stopTransfer() {
     // clearInterval(tidSendMsg);
