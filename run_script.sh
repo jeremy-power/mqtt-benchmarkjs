@@ -2,7 +2,7 @@
 
 mkdir -p reports
 
-brokers=("hivemq1" "emqx" "vernemq")
+brokers=("emqx" "hivemq1" "vernemq")
 numClients=("50" "500" "5000" "10000")
 
 echo "Stopping all existing brokers"
