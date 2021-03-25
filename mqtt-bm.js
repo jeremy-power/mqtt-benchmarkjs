@@ -29112,18 +29112,23 @@ function times(num) {
 var delay = randomExponential( rate / 1000 ); //returns delay based on rate
 
 function sendMsg(pubList) {
-  setTimeout(function () {
     let i = 0
     pubList.forEach(function (pub) {
-      if (pub.connected) {
-        metrics.numMsgSent++;
-        var msg = ['Test Msg ', metrics.numMsgSent, +new Date()].join('|');
-        pub.publish("req/" + i, msg);
-      }
+      (function(pub) {
+        delay = randomExponential( rate / 1000 ); //returns delay based on rate
+        setTimeout(function() {
+          if (pub.connected) {
+            metrics.numMsgSent++;
+            var msg = ['Test Msg ', metrics.numMsgSent, +new Date()].join('|');
+            pub.publish("req/" + i, msg);
+            if(i == numPubSub - 1) {
+              return sendMsg(pubList);
+            }
+            i++;
+          }
+        }, delay);
+      })(pub)
     });
-    delay = randomExponential( rate / 1000 ); //returns delay based on rate
-    sendMsg(pubList);
-  }, delay)
 }
 
 function makeLogStatus(timeStart) {
