@@ -28972,7 +28972,7 @@ var rl = _readline2.default.createInterface({
 });
 
 function getConfigFromCmd(argv) {
-  var acceptArgs = ['host', 'login', 'password', 'numPubSub', 'rate'];
+  var acceptArgs = ['host', 'login', 'password', 'numPubSub', 'rate', 'timeout'];
 
   if (argv.fileConfig) {
     // TODO: read config from file
@@ -29002,6 +29002,7 @@ if(conf.rate) {
 } else {
   var rate = 1;
 }
+var timeout = conf.timeout;
 var numPubSub = parseInt(conf.numPubSub);
 
 var metrics = {
@@ -29254,6 +29255,14 @@ function report() {
 }
 
 stressTest();
+
+if(timeout) {
+  setTimeout(function () {
+    var resume = stopTransfer();
+    report();
+    process.exit();
+  }, timeout * 1000);
+}
 rl.on('SIGINT', function () {
   var resume = stopTransfer();
   rl.question('Are you sure you want to exit? ', function (answer) {
