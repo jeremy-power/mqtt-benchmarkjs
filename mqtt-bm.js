@@ -29121,7 +29121,6 @@ function sendMsg(pubList) {
             metrics.numMsgSent++;
             let msgSize = (metrics.numMsgSent.toString().length) + (+new Date()).toString().length + 2;
             var msg = ['0'.repeat(1024 - msgSize), metrics.numMsgSent, +new Date()].join('|');
-            console.log(msg.length);
             pub.publish("req/" + i, msg);
             if(i == numPubSub - 1) {
               return sendMsg(pubList);
