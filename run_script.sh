@@ -8,6 +8,7 @@ numClients=("50" "500" "5000" "10000")
 echo "Stopping all existing brokers"
 sudo docker stop $(docker ps -a -q)
 for i in ${brokers[@]}; do
+	sleep 10
 	for t in ${numClients[@]}; do
 
 		echo "Starting $i Docker"
