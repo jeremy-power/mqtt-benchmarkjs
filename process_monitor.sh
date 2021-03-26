@@ -13,5 +13,5 @@ while true; do
     if [[ $1 == "hivemq1" ]]; then
         ps axo pid,etime,%cpu,%mem,cmd | grep 'hivemq' | grep -v grep | cut -f1 -d"-" >> ./reports/usage/$1$2usage.csv
     fi
-sleep 60
+sleep 10
 done
