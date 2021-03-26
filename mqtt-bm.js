@@ -29117,25 +29117,25 @@ function times(num) {
 
 var delay = randomExponential( rate / 1000 ); //returns delay based on rate
 
-function sendMsg(pubList) {
+function sendAllMessages(pubList) {
     let i = 0
     pubList.forEach(function (pub) {
-      (function(pub) {
-        delay = randomExponential( rate / 1000 ); //returns delay based on rate
-        setTimeout(function() {
-          if (pub.connected) {
-            metrics.numMsgSent++;
-            let msgSize = (metrics.numMsgSent.toString().length) + (+new Date()).toString().length + 2;
-            var msg = ['0'.repeat(1024 - msgSize), metrics.numMsgSent, +new Date()].join('|');
-            pub.publish("req/" + i, msg);
-            if(i == numPubSub - 1) {
-              return sendMsg(pubList);
-            }
-            i++;
-          }
-        }, delay);
-      })(pub)
+      sendMessage(pub, i);
+      i++;
     });
+}
+
+function sendMessage(pub, i) {
+  delay = randomExponential( rate / 1000 ); //returns delay based on rate
+  setTimeout(function() {
+    if (pub.connected) {
+      metrics.numMsgSent++;
+      let msgSize = (metrics.numMsgSent.toString().length) + (+new Date()).toString().length + 2;
+      var msg = ['0'.repeat(1024 - msgSize), metrics.numMsgSent, +new Date()].join('|');
+      pub.publish("req/" + i, msg);
+      return sendMessage(pub, i);
+    }
+  }, delay);
 }
 
 function makeLogStatus(timeStart) {
@@ -29156,12 +29156,12 @@ var stopTransfer = null;
 function doTransfer(pubList) {
   var logStatus = makeLogStatus(+new Date());
   
-  sendMsg(pubList);
+  sendAllMessages(pubList);
 
-  // var tidSendMsg = setInterval(function () {
+  // var tidsendAllMessages = setInterval(function () {
   //   let delay = randomExponential(60) * 60*60*1000; //returns delay based on rate
   //   console.log('doTransfer:', delay);
-  //   return sendMsg(pubList);
+  //   return sendAllMessages(pubList);
   // }, delay);
   if(limitLogging) {
     var tidLogStatus = setInterval(function () {
@@ -29174,7 +29174,7 @@ function doTransfer(pubList) {
   }
 
   stopTransfer = function stopTransfer() {
-    // clearInterval(tidSendMsg);
+    // clearInterval(tidsendAllMessages);
     clearInterval(tidLogStatus);
     _logUpdate2.default.done();
     return function resume() {
