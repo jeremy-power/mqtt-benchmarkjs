@@ -11,7 +11,14 @@ Follow the instruction benchmark setup on this doc http://www.scalagent.com/IMG/
 
 Example command: 
 ```
-numPubSub: number of publisher and subscriber pairs
-rate: number of messages per second approximately by exponential randomness
+numPubSub (int): number of publisher and subscriber pairs
+rate (float): number of messages per second approximately by exponential randomness
+
 node mqtt-bm.js --host="127.0.0.1"  --numPubSub=10 --rate=1
+
+optional parameters:
+limitLogging (boolean): limits number of messages sent logging to every 5 seconds for long duration logging
+timeout (int): number of seconds before the program will automatically end and report (off by default, will run infinitely until cancelled)
+
+node mqtt-bm.js --host="127.0.0.1"  --numPubSub=10 --rate=1 --timeout=60 --limitLogging=1
 ```
