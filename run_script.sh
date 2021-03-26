@@ -1,6 +1,7 @@
 #!/bin/bash
 rm -r reports
 mkdir -p reports
+mkdir -p ./reports/usage
 
 brokers=("emqx" "hivemq1" "vernemq")
 numClients=("50" "500" "5000" "10000")
@@ -15,7 +16,7 @@ for i in ${brokers[@]}; do
 		sudo docker start $i
 		echo "Waiting for broker to finish starting up"
 		sleep 10
-		timeout 900 ./process_monitor $3 &
+		timeout 900 ./process_monitor $i $t &
 
 		echo "Running node script with $t publishers and $t subscribers with 0.04 messages/second for 15 minutes."
 		node mqtt-bm.js --host="127.0.0.1"  --numPubSub=$t --rate=0.04 --timeout=900 --limitLogging=1 | tee ./reports/$i$t.log
