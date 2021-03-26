@@ -15,7 +15,7 @@ for i in ${brokers[@]}; do
 		sudo docker start $i
 		echo "Waiting for broker to finish starting up"
 		sleep 10
-		timeout 60 ./process_monitor $i $t &
+		timeout 60 ./process_monitor.sh $i $t &
 
 		echo "Running node script on $i with $t publishers and $t subscribers with 0.04 messages/second for 15 minutes." | tee -a ./reports/$i$t.log
 		echo "Starting at $dt" | tee -a ./reports/$i$t.log
